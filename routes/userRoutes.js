@@ -4,9 +4,8 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-//THIS IS FOR THIS LECTURE
+// Creating a route for "/signup"
 router.post('/signup', authController.signup);
-// Ends here
 
 // WERE ARE IMPLEMNTING USER ROUTES:
 // These have no IDs
