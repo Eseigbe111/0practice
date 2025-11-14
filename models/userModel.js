@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8,
+    select: false,
   },
 
   // This part actually is for when u are creaing a new acc, and is just to make sure that ur passwords are
@@ -65,6 +66,20 @@ userSchema.pre('save', async function (next) {
 });
 // NB:Every time a new user is created or a password is changed, the password is automatically hashed and secured, while passwordConfirm is discarded.
 
+// THIS IS FOR THIS LECTURE
+// CORRECTPASSWORD Instance Method: This checks if password from database matches the one entered on screen
+// The correctPassword function is an instance method added to the userSchema. Instance methods are functions available on all documents of a collection.
+userSchema.methods.correctPassword = async function (
+  canditatePassword,
+  userPassword,
+  // Because the password field is hidden (select: false), this method receives the stored password as a parameter instead of using this.password.
+) {
+  // Uses bcrypt.compare() to check if the entered password matches the hashed one.
+  return await bcrypt.compare(canditatePassword, userPassword);
+  // Returns true if the passwords match, otherwise false.
+};
+
+// Ends here
 
 const User = mongoose.model('User', userSchema);
 

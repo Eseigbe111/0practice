@@ -1,14 +1,25 @@
+const User = require('../models/userModel');
+const catchAsync = require('../utils/catchAsync');
+
 // USERS HANDLERS
 //// Fc for Handling getAllUsers
-exports.getAllUsers = (req, res) => {
-  // 500 means internal server error
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
+// THIS IS FOR THIS LECTURE
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find();
+
+  // sending a response
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: {
+      users,
+    },
   });
-};
+});
+// Ends here
+
 //// Fc for Handling createAllUsers
-exports.createAllUsers = (req, res) => {
+exports.createAllUsers = (req, res, next) => {
   // 500 means internal server error
   res.status(500).json({
     status: 'error',
@@ -16,7 +27,7 @@ exports.createAllUsers = (req, res) => {
   });
 };
 //// Fc for Handling getUser
-exports.getUser = (req, res) => {
+exports.getUser = (req, res, next) => {
   // 500 means internal server error
   res.status(500).json({
     status: 'error',
@@ -24,7 +35,7 @@ exports.getUser = (req, res) => {
   });
 };
 //// Fc for Handling updateUser
-exports.updateUser = (req, res) => {
+exports.updateUser = (req, res, next) => {
   // 500 means internal server error
   res.status(500).json({
     status: 'error',
@@ -32,7 +43,7 @@ exports.updateUser = (req, res) => {
   });
 };
 //// Fc for Handling deleteUser
-exports.deleteUser = (req, res) => {
+exports.deleteUser = (req, res, next) => {
   // 500 means internal server error
   res.status(500).json({
     status: 'error',
