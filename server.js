@@ -15,10 +15,7 @@ const DB = process.env.DATABASE.replace(
 
 // Connecting to Mongo Atlas
 mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(DB)
   .then(() => console.log('✅ DB connection successful!'))
   .catch((err) => console.error('❌ Connection error:', err));
 
@@ -75,5 +72,3 @@ process.on('unhandledRejection', (err) => {
 //   console.log(x); // Error triggered when request is received
 //   next();
 // });
-
-

@@ -33,8 +33,6 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'Please provide a password'],
-    // THIS IS FOR THIS LECTURE
-    // MANAGING PASSWORDS
     // VALIDATING THE PASSWORD: A custom validator checks whether passwordConfirm matches password.
     // This validation only works when a document is saved (like with User.create() or user.save()), not with methods like findOneAndUpdate().
     // That’s why, when updating a password later, you must use .save() to trigger this check.
@@ -48,10 +46,11 @@ const userSchema = new mongoose.Schema({
     },
   },
 });
-// U can test this using 127.0.0.1:3000/api/v1/users/signup by creating a new user
+
 // ENCRYPTING THE PASSWORD: To do this we use bycrypt which we install by doing "npm i bcryptjs"
 // Why use pre-save middleware: Encryption should happen in the model, not the controller, because it concerns the data itself.
 // The pre('save') middleware runs between receiving the data and saving it to MongoDB — the perfect time to modify (hash) the password.
+// U can test this using 127.0.0.1:3000/api/v1/users/signup by creating a new user
 userSchema.pre('save', async function (next) {
   //a) Checking if password was modified: Skip hashing if the password hasn’t changed (e.g., when updating only email).
   if (!this.isModified('password')) return next();
@@ -65,7 +64,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 // NB:Every time a new user is created or a password is changed, the password is automatically hashed and secured, while passwordConfirm is discarded.
-// Ends here
+
 
 const User = mongoose.model('User', userSchema);
 
