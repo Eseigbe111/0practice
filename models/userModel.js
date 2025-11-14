@@ -46,6 +46,12 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same',
     },
   },
+
+  // THIS IS FOR THIS LECTURE
+  // It stores the date/time when the user last changed their password.
+  passwordChangedAt: Date,
+  // Old users in the database won’t have it until a password change happens.
+  // Ends here
 });
 
 ///////////////
@@ -70,8 +76,8 @@ userSchema.pre('save', async function (next) {
 
 //////////////////
 
-// CORRECTPASSWORD Instance Method: This checks if password from database matches the one entered on screen
-// The correctPassword function is an instance method added to the userSchema. Instance methods are functions available on all documents of a collection.
+// CORRECTPASSWORD() Instance Method: This checks if password from database matches the one entered on screen
+// The correctPassword() function is an instance method added to the userSchema. Instance methods are functions available on all documents of a collection.
 userSchema.methods.correctPassword = async function (
   canditatePassword,
   userPassword,
@@ -82,6 +88,29 @@ userSchema.methods.correctPassword = async function (
   // Returns true if the passwords match, otherwise false.
 };
 
+//////////////
+// THIS IS FOR THIS LECTURE
+// CHANGEDPASSWORDAFTER() Instance Mthd: This prevents users from using old tokens after they change their password.
+// If the password was changed, the user must log in again to get a new, valid token.
+// changedPasswordAfter() This method checks whether a user changed their password after the JWT token was issued.
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  // 1)checking If passwordChangedAt exists
+  if (this.passwordChangedAt) {
+    // 2) Convert passwordChangedAt to a timestamp in seconds
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10, // we specify the base by usig 10
+    );
+    // 3)Compare it to the token’s timestamp (JWTTimestamp).
+    // If passwordChangedAt > JWTTimestamp, return true → password was changed after token → token becomes invalid.
+    return JWTTimestamp < changedTimestamp;
+  }
+  // If passwordChangedAt does not exist: User never changed password → return false.
+  return false;
+};
+// Ends here
+
+////////////////
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

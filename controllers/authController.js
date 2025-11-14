@@ -1,3 +1,5 @@
+// const util = require('util'); //OR
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
@@ -22,7 +24,8 @@ const signToken = (id) => {
 // Handling the signup()
 exports.signup = catchAsync(async (req, res, next) => {
   // Creating name, email,password and passwordConfirm onthe  req.body
-  const { name, email, password, passwordConfirm } = req.body;
+  const { name, email, password, passwordConfirm /* passwordChangedAt  */ } =
+    req.body;
 
   // creating a new user
   const newUser = await User.create({
@@ -30,6 +33,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email,
     password,
     passwordConfirm,
+    /* passwordChangedAt, */
   });
 
   // Signing up USers
@@ -45,7 +49,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
-// THIS IS FOR THIS LECTURE
 // LOGGING IN USERS
 exports.login = catchAsync(async (req, res, next) => {
   //1) Read input: Extract email and password from req.body.
@@ -77,9 +80,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 ///////////////
-// THIS IS FOR THIS LECTURE
-// PROTECTING TOUR ROUTES PART 1: Watch how jonas did and tested this part if confused
-// MIDDLEWARE THAT PROTECTS ROUTES
+// MIDDLEWARE THAT PROTECTS ROUTES: Watch how jonas did and tested this part if confused
 // After implementing login and generating a JWT for users with the correct email and password, the next step in authentication
 // is protecting routes.This ensures that only logged-in users (those who have a valid JWT) can access certain endpoints.
 // To do this, we create a middleware function called protect that runs before the route handler (e.g., getAllTours). This
@@ -88,22 +89,52 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
   //1) Checking if req.headers.authorization exists and if it starts with
-  if (req.headers.authorization?.startsWith('Bearer')) {
+  if (
+    // I changed this "req.headers.authorization?.startsWith('Bearer')" bsck to the below bcos it stopped giving
+    // color to await or return
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     //2) Extracts the token
     token = req.headers.authorization.split(' ')[1];
   }
-  console.log(token);
+  // console.log(token);
   // 3) If no token exists → deny access: It immediately throws a 401 error
   if (!token) {
     return next(
       new AppError('You are not logged in! Please log in to get access', 401),
     );
   }
+
+  // THIS IS FFOR THIS LECTURE
+  // PROTECTING TOUR ROUTES PART 2
   // 4) Token verification (to be implemented next): Validate the token using jwt.verify.
+  // Use jwt.verify() to check if the token is valid, not expired, and not tampered with.
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // promisify() is used so we can await the verification.
+  console.log(decoded);
 
-  // 5) Check if the user changed their password after the token was issued (to be implemented)
+  // 5) Check if user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        'The user belonging to this token does no longer exist.',
+        401,
+      ),
+    );
+  }
 
-  // 6) If all checks pass → allow access: Calls next() and the actual route handler runs (e.g., getAllTours).
+  // 6) Check if the user changed their password after the token was issued (to be implemented)
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again', 401),
+    );
+  }
+  // 7) Grant Access To Protect Route
+  req.user = currentUser;
+  // 8) If all checks pass → allow access: Calls next() and the actual route handler runs (e.g., getAllTours).
   next();
+
+  // Ends here
 });
-// Ends here

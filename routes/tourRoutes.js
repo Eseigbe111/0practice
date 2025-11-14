@@ -21,10 +21,8 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 // These have no IDs
 router
   .route('/')
-  // THIS IS FOR THIS LECTURE
   // Allowing only logged in users to get access to all the tours
   .get(authController.protect, tourController.getAllTours)
-  // Ends here
   .post(tourController.createTour);
 
 // These have IDs

@@ -1,5 +1,5 @@
 ///THIS IS FOR THIS LECTURE
-// THis will be coded in "authController.js" and "tourRoute.js" and "app.js"
+// THis will be coded in "userModel.js" and  "authController.js" and "errorController.js"
 
 // Ends here
 
