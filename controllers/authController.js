@@ -3,7 +3,6 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-// THIS IS FOR THIS LECTURE
 // CREATING A JWT:
 // To use JWT, we install it by doing "npm install jsonwebtoken" and require it above
 // A JWT token is created using jwt.sign(), which takes three parts:
@@ -19,7 +18,6 @@ const signToken = (id) => {
   );
   // This token setup above helps securely authenticate users and automatically logs them out after a set period.
 };
-// Ends here
 
 // Handling the signup()
 exports.signup = catchAsync(async (req, res, next) => {
@@ -76,5 +74,36 @@ exports.login = catchAsync(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+///////////////
+// THIS IS FOR THIS LECTURE
+// PROTECTING TOUR ROUTES PART 1: Watch how jonas did and tested this part if confused
+// MIDDLEWARE THAT PROTECTS ROUTES
+// After implementing login and generating a JWT for users with the correct email and password, the next step in authentication
+// is protecting routes.This ensures that only logged-in users (those who have a valid JWT) can access certain endpoints.
+// To do this, we create a middleware function called protect that runs before the route handler (e.g., getAllTours). This
+// middleware verifies whether the incoming request contains a valid JSON Web Token.
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+
+  //1) Checking if req.headers.authorization exists and if it starts with
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    //2) Extracts the token
+    token = req.headers.authorization.split(' ')[1];
+  }
+  console.log(token);
+  // 3) If no token exists → deny access: It immediately throws a 401 error
+  if (!token) {
+    return next(
+      new AppError('You are not logged in! Please log in to get access', 401),
+    );
+  }
+  // 4) Token verification (to be implemented next): Validate the token using jwt.verify.
+
+  // 5) Check if the user changed their password after the token was issued (to be implemented)
+
+  // 6) If all checks pass → allow access: Calls next() and the actual route handler runs (e.g., getAllTours).
+  next();
 });
 // Ends here

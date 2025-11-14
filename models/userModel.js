@@ -48,6 +48,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+///////////////
+
 // ENCRYPTING THE PASSWORD: To do this we use bycrypt which we install by doing "npm i bcryptjs"
 // Why use pre-save middleware: Encryption should happen in the model, not the controller, because it concerns the data itself.
 // The pre('save') middleware runs between receiving the data and saving it to MongoDB — the perfect time to modify (hash) the password.
@@ -66,7 +68,8 @@ userSchema.pre('save', async function (next) {
 });
 // NB:Every time a new user is created or a password is changed, the password is automatically hashed and secured, while passwordConfirm is discarded.
 
-// THIS IS FOR THIS LECTURE
+//////////////////
+
 // CORRECTPASSWORD Instance Method: This checks if password from database matches the one entered on screen
 // The correctPassword function is an instance method added to the userSchema. Instance methods are functions available on all documents of a collection.
 userSchema.methods.correctPassword = async function (
@@ -78,8 +81,6 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(canditatePassword, userPassword);
   // Returns true if the passwords match, otherwise false.
 };
-
-// Ends here
 
 const User = mongoose.model('User', userSchema);
 

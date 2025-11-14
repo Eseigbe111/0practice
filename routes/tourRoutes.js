@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -20,7 +21,10 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 // These have no IDs
 router
   .route('/')
-  .get(tourController.getAllTours)
+  // THIS IS FOR THIS LECTURE
+  // Allowing only logged in users to get access to all the tours
+  .get(authController.protect, tourController.getAllTours)
+  // Ends here
   .post(tourController.createTour);
 
 // These have IDs

@@ -3,7 +3,6 @@ const catchAsync = require('../utils/catchAsync');
 
 // USERS HANDLERS
 //// Fc for Handling getAllUsers
-// THIS IS FOR THIS LECTURE
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
 
@@ -16,7 +15,6 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     },
   });
 });
-// Ends here
 
 //// Fc for Handling createAllUsers
 exports.createAllUsers = (req, res, next) => {

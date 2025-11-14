@@ -7,10 +7,8 @@ const router = express.Router();
 // Creating a route for "/signup"
 router.post('/signup', authController.signup);
 
-// THIS IS FOR THIS LECTURE
 // Creating a route for "/login"
 router.post('/login', authController.login);
-// Ends here
 
 // WERE ARE IMPLEMNTING USER ROUTES:
 // These have no IDs
