@@ -141,7 +141,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // THIS IS FOR THIS LECTURE
-// AUTHORIZATION USEER ROLES AND PERMISSIONS: We deleted allthe users bcos we want to create users based on roles
+// AUTHORIZATION USER ROLES AND PERMISSIONS: We deleted all the users bcos we want to create users based on roles
 // The below is a wrapper fc. The goal of this fc is to allow only users with specific roles to delete tours
 exports.restrictTo = (...roles) => {
   // This takes an array of all the roles
