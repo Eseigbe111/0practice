@@ -29,7 +29,7 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 404);
 };
 
-// THIS IS FOR THIS LECTURE
+
 // 4) FC FOR HANDLING JWT ERROR
 // a)Error CAused by Manipulated / Invalid Token
 const handleJWTError = () =>
@@ -39,8 +39,6 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
-
-// Ends here
 
 
 //////////
@@ -120,7 +118,7 @@ module.exports = (err, req, res, next) => {
       error = handleValidationErrorDB(error);
 
 
-    // THIS IS FOR THIS LECTURE
+    
     // e) THIS handles two types of JWT-related errors:
     // 1) Manipulated / Invalid Token: If someone tampers with the token, jwt.verify() throws a JsonWebTokenError.
     if (error.name === 'JsonWebTokenError') error = handleJWTError(error);
@@ -128,9 +126,6 @@ module.exports = (err, req, res, next) => {
     // 2) Expired Token
     if (error.name === 'TokenExpiredError')
       error = handleJWTExpiredError(error);
-
-
-    // Ends here
 
     // Sending Prodn Error
     sendErrorProd(error, res);

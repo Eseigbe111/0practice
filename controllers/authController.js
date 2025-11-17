@@ -107,9 +107,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // THIS IS FFOR THIS LECTURE
-  // PROTECTING TOUR ROUTES PART 2
-  // 4) Token verification (to be implemented next): Validate the token using jwt.verify.
+  // 4) Token verification: Validate the token using jwt.verify.
   // Use jwt.verify() to check if the token is valid, not expired, and not tampered with.
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   // promisify() is used so we can await the verification.
@@ -126,7 +124,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 6) Check if the user changed their password after the token was issued (to be implemented)
+  // 6) Check if the user changed their password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again', 401),
@@ -136,8 +134,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   // 8) If all checks pass → allow access: Calls next() and the actual route handler runs (e.g., getAllTours).
   next();
-
-  // Ends here
 });
 
 // THIS IS FOR THIS LECTURE

@@ -33,7 +33,7 @@ router
   // THIS IS FOR THIS LECTURE
   // IMPLEMENTING AUTHORIZATION USEER ROLES AND PERMISSIONS
   .delete(
-    // To delete a tour, w only want Admins and lead guides to be a ble to perform that i.e 'lead-guide', 'admin' as they are in our userModel
+    // To delete a tour, we only want Admins and lead guides to be a ble to perform that i.e 'lead-guide', 'admin' as they are in our userModel
     authController.protect,
     // To delete a tour, either of the former must be logged in, and also deleting can only be performed be done by 'lead-guide', 'admin'.
     // Hence will be restrictd to only both
