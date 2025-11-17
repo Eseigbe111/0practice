@@ -13,9 +13,19 @@ router.post('/login', authController.login);
 // Creating a route for forgot password
 router.post('/forgotPassword', authController.forgotPassword); // This will receive only the email address
 
-// THIS IS FOR THIS LECTURE
 // Creating a route for reset Password using the token
 router.patch('/resetPassword/:token', authController.resetPassword); // This will receive only the email address
+
+// THIS IS FOR THIS LECTURE
+// Route for Updating the user password without forgetting it
+// We are using patch bcos we are manipulating the user data and not creating form the scratch
+router.patch(
+  '/updateMyPassword',
+  authController.protect,
+  authController.updatePassword,
+);
+//
+
 // Ends here
 
 // WERE ARE IMPLEMNTING USER ROUTES:

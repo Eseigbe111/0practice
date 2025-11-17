@@ -23,7 +23,27 @@ const signToken = (id) => {
   );
   // This token setup above helps securely authenticate users and automatically logs them out after a set period.
 };
+////////////////
 
+//THIS FOR THSI LECTURE
+// REfactoring response code for loging in user
+const createSendToken = (user, statusCode, res) => {
+  // To use JWT, we import it also on the top of our file:
+  const token = signToken(user._id);
+
+  //Sending the response
+  res.status(statusCode).json({
+    status: 'success',
+    token, //sending the token to the client
+    data: {
+      user,
+    },
+  });
+};
+
+///Ends here
+
+////////////////
 // Handling the signup()
 exports.signup = catchAsync(async (req, res, next) => {
   // Creating name, email,password and passwordConfirm onthe  req.body
@@ -40,17 +60,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     /* role, */
   });
 
-  // Signing up USers
-  const token = signToken(newUser._id);
-
-  //Sending a response of 201 for created
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      newUser,
-    },
-  });
+  //Creating the JWT and sending the response by using the Refactored code
+  createSendToken(newUser, 201, res);
 });
 
 // LOGGING IN USERS
@@ -74,13 +85,8 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //5) If everything is ok, send token to client
-  const token = signToken(user._id);
-
-  //
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  //Creating the JWT and sending the response by using the Refactored code
+  createSendToken(user, 200, res);
 });
 
 ///////////////
@@ -215,7 +221,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-// THIS IS FOR THIS LECTURE
 // PASSWORD RESET FCLTY_ SETTING NEW PASSWORD
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get token from the URL and hash it: The token in the URL is plain, but the version stored in MongoDB is hashed.
@@ -253,11 +258,31 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //This part will be done in the userModel using a pre('save) middleware
 
   // 7) Log the user in i.e send the JWT to the client
-  const token = signToken(user._id);
+  //Creating the JWT and sending the response by using the Refactored code
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+// THIS IS FOR THIS LECTURE
+// UPDATING THE CURRENT USER PASSWORD: This is without the user forgetting it
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get the current user
+  const user = await User.findById(req.user.id).select('+password');
+  // .select('+password') is used because the password field is usually excluded by default in the User model.
+
+  // 2) Check if the current password is correct
+  // Compares the password entered by the user (req.body.passwordCurrent) with the hashed password in the database.
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401)); //401 is unauthorized
+  }
+
+  // 3) Update the password
+  // If password is correct, then update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save(); // We do not turn off the validatn, bcos we want it to happen
+
+  // 4) Send a new JWT and log the user in
+  // createSendToken(user, 200, res); // This fc is at the top of this file
+  createSendToken(user, 200, res);
 });
 // Ends here

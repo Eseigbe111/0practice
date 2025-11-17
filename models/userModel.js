@@ -85,7 +85,7 @@ userSchema.pre('save', async function (next) {
 // NB:Every time a new user is created or a password is changed, the password is automatically hashed and secured, while passwordConfirm is discarded.
 
 // //////
-// THIS IS FOR THIS LECTURE
+
 // UPDATE the changedPasswordAt ppt for the current user
 userSchema.pre('save', function (next) {
   // 1) Check if password was not modified, and if it was not, then do not change the changedPasswordAt ppt OR
@@ -97,7 +97,6 @@ userSchema.pre('save', function (next) {
 
   next();
 });
-// Ends here
 
 //////////////////
 

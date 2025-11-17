@@ -1,6 +1,6 @@
 ///THIS IS FOR THIS LECTURE
 
-// THis will be coded in userRoute "authController" and  "userModel"
+// THis will be coded  "userRoute" and "authController"
 
 // Ends here
 
