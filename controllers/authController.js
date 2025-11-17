@@ -24,8 +24,8 @@ const signToken = (id) => {
 // Handling the signup()
 exports.signup = catchAsync(async (req, res, next) => {
   // Creating name, email,password and passwordConfirm onthe  req.body
-  const { name, email, password, passwordConfirm /* passwordChangedAt  */ } =
-    req.body;
+
+  const { name, email, password, passwordConfirm /* role */ } = req.body;
 
   // creating a new user
   const newUser = await User.create({
@@ -33,7 +33,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     email,
     password,
     passwordConfirm,
-    /* passwordChangedAt, */
+
+    /* role, */
   });
 
   // Signing up USers
@@ -138,3 +139,22 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Ends here
 });
+
+// THIS IS FOR THIS LECTURE
+// AUTHORIZATION USEER ROLES AND PERMISSIONS: We deleted allthe users bcos we want to create users based on roles
+// The below is a wrapper fc. The goal of this fc is to allow only users with specific roles to delete tours
+exports.restrictTo = (...roles) => {
+  // This takes an array of all the roles
+
+  //THis is the middleware
+  return (req, res, next) => {
+    //roles ['admin', 'lead-guide']
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403),
+      );
+    }
+    next();
+  };
+};
+// Ends here

@@ -22,6 +22,15 @@ const userSchema = new mongoose.Schema({
   // We want users to be able to upload a photo and this is usually optional in most web application
   photo: String,
 
+  // THIS IS FOR THIS LECTURE
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'], // These names are subject to the type of applicatn u are
+    // creating. But in our case, it is what we listed above that make sense
+    default: 'user',
+  },
+  // Ends here
+
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -52,6 +61,12 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   // Old users in the database won’t have it until a password change happens.
   // Ends here
+
+  // It stores the date/time when the user last changed their password.
+  passwordChangedAt: Date,
+  // Old users in the database won’t have it until a password change happens.
+
+
 });
 
 ///////////////
@@ -108,6 +123,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   // If passwordChangedAt does not exist: User never changed password → return false.
   return false;
 };
+
 // Ends here
 
 ////////////////

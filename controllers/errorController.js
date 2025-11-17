@@ -39,7 +39,9 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
+
 // Ends here
+
 
 //////////
 // ERRORS DURING DEVEPT VS PRODUCTION
@@ -117,6 +119,7 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
 
+
     // THIS IS FOR THIS LECTURE
     // e) THIS handles two types of JWT-related errors:
     // 1) Manipulated / Invalid Token: If someone tampers with the token, jwt.verify() throws a JsonWebTokenError.
@@ -125,6 +128,8 @@ module.exports = (err, req, res, next) => {
     // 2) Expired Token
     if (error.name === 'TokenExpiredError')
       error = handleJWTExpiredError(error);
+
+
     // Ends here
 
     // Sending Prodn Error
