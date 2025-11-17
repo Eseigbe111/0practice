@@ -175,6 +175,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false }); // This type of error was the one i got when trying to sent the
   // 9 tours to the MongoDB
 
+  // THIS IS FOR THIS LECTURE
   // 6) Send it to the user's email
   //a) Generate a resetURL: We will test this by using smth like this PATCH {{URL}}api/v1/users/resetPassword/433555
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
@@ -213,3 +214,4 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     );
   }
 });
+// Ends here

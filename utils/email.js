@@ -35,3 +35,5 @@ const sendEmail = async (options) => {
 
 module.exports = sendEmail;
 // we will use this in the authController
+
+// Ends here
