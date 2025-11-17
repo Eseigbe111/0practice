@@ -23,14 +23,12 @@ const userSchema = new mongoose.Schema({
   // We want users to be able to upload a photo and this is usually optional in most web application
   photo: String,
 
-  // THIS IS FOR THIS LECTURE
   role: {
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'], // These names are subject to the type of applicatn u are
     // creating. But in our case, it is what we listed above that make sense
     default: 'user',
   },
-  // Ends here
 
   password: {
     type: String,
@@ -61,12 +59,9 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   // Old users in the database won’t have it until a password change happens.
 
-  // THIS IS FOR THIS LECTURE
   passwordResetToken: String,
 
   passwordResetExpires: Date,
-
-  // Ends here
 });
 
 ///////////////
@@ -124,7 +119,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 
 //////
-// THIS IS FOR THIS LECTURE
 // CREATEPASSWORDRESETTOKEN() instance mthd for Password Reset Token
 // Not as strong as a password hash—just enough for a one-time token.
 userSchema.methods.createPasswordResetToken = function () {
@@ -146,7 +140,6 @@ userSchema.methods.createPasswordResetToken = function () {
   // The encrypted version is saved in the database for later verification.
   return resetToken;
 };
-// Ends here
 
 ////////////////
 const User = mongoose.model('User', userSchema);

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
+const { stat } = require('fs');
 
 // CREATING A JWT:
 // To use JWT, we install it by doing "npm install jsonwebtoken" and require it above
@@ -153,7 +155,6 @@ exports.restrictTo = (...roles) => {
   };
 };
 
-// THIS IS FOR THIS LECTURE
 // PASSWORD RESET FCLTY
 // 1) User submits email via a POST request to the forgotPassword route.
 // The user does not need to provide their ID bcos they can not know it.
@@ -174,7 +175,41 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false }); // This type of error was the one i got when trying to sent the
   // 9 tours to the MongoDB
 
-  // 6)
-});
+  // 6) Send it to the user's email
+  //a) Generate a resetURL: We will test this by using smth like this PATCH {{URL}}api/v1/users/resetPassword/433555
+  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+  // Now we are hard coding the the above which is not good and we will fix it later
 
-// Ends here
+  //b) Generating message
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+
+  //c) We used this trycatch block in case we get an error from Sendgrid itself. And if this happens we want to reset
+  // the "token" i.e "PasswordResetToken" and the expires ppt i.e "passwordResetExpires"
+  try {
+    await sendEmail({
+      email: user.email, // OR req.body.email
+      subject: 'Your password reset token (valid for 10 min)',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+    });
+  } catch (err) {
+    //i) We want to Reset these below ppts when an error occurs
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    //ii) The cleaned User object is saved again
+    await user.save({ validateBeforeSave: false });
+
+    //iii) User receives a friendly error message
+    return next(
+      new AppError(
+        'There was an error sending the email. Try again later!',
+        500,
+      ),
+    );
+  }
+});

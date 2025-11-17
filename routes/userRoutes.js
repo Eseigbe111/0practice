@@ -10,11 +10,8 @@ router.post('/signup', authController.signup);
 // Creating a route for "/login"
 router.post('/login', authController.login);
 
-/// THIS IS FOR THIS LECTURE
 // Creating a route for forgot password
 router.post('/forgotPassword', authController.forgotPassword); // This will receive only the email address
-
-// Ends here
 
 // WERE ARE IMPLEMNTING USER ROUTES:
 // These have no IDs
