@@ -1,6 +1,6 @@
 ///THIS IS FOR THIS LECTURE
 
-// THis will be coded in tourRoute, "userModel.js" and  "authController.js" 
+// THis will be coded in "userRoutes", "userModel" and "authController"
 
 // Ends here
 

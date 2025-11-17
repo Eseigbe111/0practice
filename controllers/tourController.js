@@ -57,13 +57,11 @@ exports.getTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
   //findById is an helper fc for writting findOne({_id: req.params.id}) with the filter object
 
-  // THIS IS FOR THIS LECTURE :
   // ADDING 404 NOT FOUND ERRORS: To test this use the ID of  deleted tour
   // Checking if no tour i.e !tour
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
   }
-  // Ends here
 
   //Sending a response
   res.status(200).json({

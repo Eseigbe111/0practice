@@ -30,7 +30,6 @@ router
   .route('/:id')
   .get(tourController.getTour)
   .patch(tourController.updateTour)
-  // THIS IS FOR THIS LECTURE
   // IMPLEMENTING AUTHORIZATION USEER ROLES AND PERMISSIONS
   .delete(
     // To delete a tour, we only want Admins and lead guides to be a ble to perform that i.e 'lead-guide', 'admin' as they are in our userModel
@@ -40,6 +39,5 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour,
   );
-// Ends here
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 // Creating the user schema
 const userSchema = new mongoose.Schema({
@@ -56,17 +57,16 @@ const userSchema = new mongoose.Schema({
     },
   },
 
+  // It stores the date/time when the user last changed their password.
+  passwordChangedAt: Date,
+  // Old users in the database won’t have it until a password change happens.
+
   // THIS IS FOR THIS LECTURE
-  // It stores the date/time when the user last changed their password.
-  passwordChangedAt: Date,
-  // Old users in the database won’t have it until a password change happens.
+  passwordResetToken: String,
+
+  passwordResetExpires: Date,
+
   // Ends here
-
-  // It stores the date/time when the user last changed their password.
-  passwordChangedAt: Date,
-  // Old users in the database won’t have it until a password change happens.
-
-
 });
 
 ///////////////
@@ -104,7 +104,6 @@ userSchema.methods.correctPassword = async function (
 };
 
 //////////////
-// THIS IS FOR THIS LECTURE
 // CHANGEDPASSWORDAFTER() Instance Mthd: This prevents users from using old tokens after they change their password.
 // If the password was changed, the user must log in again to get a new, valid token.
 // changedPasswordAfter() This method checks whether a user changed their password after the JWT token was issued.
@@ -124,6 +123,29 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
+//////
+// THIS IS FOR THIS LECTURE
+// CREATEPASSWORDRESETTOKEN() instance mthd for Password Reset Token
+// Not as strong as a password hash—just enough for a one-time token.
+userSchema.methods.createPasswordResetToken = function () {
+  //1) Generate Token:
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  //2) Encrypt & Store Token in DB in passwordResetToken
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log(resetToken, this.passwordResetToken);
+
+  //3) passwordResetExpires is set to 10 minutes from wen generated after which it expires.
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  // 4) Return Token: The plain token (resetToken) is sent to the user via email.
+  // The encrypted version is saved in the database for later verification.
+  return resetToken;
+};
 // Ends here
 
 ////////////////

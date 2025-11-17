@@ -136,7 +136,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-// THIS IS FOR THIS LECTURE
 // AUTHORIZATION USER ROLES AND PERMISSIONS: We deleted all the users bcos we want to create users based on roles
 // The below is a wrapper fc. The goal of this fc is to allow only users with specific roles to delete tours
 exports.restrictTo = (...roles) => {
@@ -153,4 +152,29 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+// THIS IS FOR THIS LECTURE
+// PASSWORD RESET FCLTY
+// 1) User submits email via a POST request to the forgotPassword route.
+// The user does not need to provide their ID bcos they can not know it.
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  //2) Get user thru their email
+  const user = await User.findOne({ email: req.body.email });
+
+  //3) Verifying if user exists
+  if (!user) {
+    return next(new AppError('There is no user with that email address.', 404)); // 404 is not found
+  }
+
+  // 4) Generate a reset token: A random token (not a JWT) is created.
+  // This logic is implemented as a method on the userModel: createPasswordResetToken()
+  const resetToken = user.createPasswordResetToken();
+
+  // 5) Save the user document: validateBeforeSave: false bypasses schema validators to avoid errors.
+  await user.save({ validateBeforeSave: false }); // This type of error was the one i got when trying to sent the
+  // 9 tours to the MongoDB
+
+  // 6)
+});
+
 // Ends here
