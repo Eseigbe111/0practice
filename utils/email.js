@@ -1,4 +1,3 @@
-// THIS IS FOR THIS LECTURE
 //1) We start by installing Nodemailer by doing "npm i nodemailer" which we will use to
 // send email in aur application
 const nodemailer = require('nodemailer');

@@ -13,6 +13,11 @@ router.post('/login', authController.login);
 // Creating a route for forgot password
 router.post('/forgotPassword', authController.forgotPassword); // This will receive only the email address
 
+// THIS IS FOR THIS LECTURE
+// Creating a route for reset Password using the token
+router.patch('/resetPassword/:token', authController.resetPassword); // This will receive only the email address
+// Ends here
+
 // WERE ARE IMPLEMNTING USER ROUTES:
 // These have no IDs
 router

@@ -1,3 +1,5 @@
+// Importng built-in package 1st
+const crypto = require('crypto');
 // const util = require('util'); //OR
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
@@ -5,7 +7,6 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
-const { stat } = require('fs');
 
 // CREATING A JWT:
 // To use JWT, we install it by doing "npm install jsonwebtoken" and require it above
@@ -175,7 +176,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false }); // This type of error was the one i got when trying to sent the
   // 9 tours to the MongoDB
 
-  // THIS IS FOR THIS LECTURE
   // 6) Send it to the user's email
   //a) Generate a resetURL: We will test this by using smth like this PATCH {{URL}}api/v1/users/resetPassword/433555
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
@@ -213,5 +213,51 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       ),
     );
   }
+});
+
+// THIS IS FOR THIS LECTURE
+// PASSWORD RESET FCLTY_ SETTING NEW PASSWORD
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1) Get token from the URL and hash it: The token in the URL is plain, but the version stored in MongoDB is hashed.
+  //So we will need to encrypt it
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  // 2) Search for the User with the token above in the database
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // 3) Checking if User with the token above exits so we can give an error message if not
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+
+  // 4) If User wiith that token exists, we do the below
+  // a) Set the new password for the user
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  // b) Delete the passwordResetToken and passwordResetExpires
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  // 5) Saving the doc
+  // In this case, we don't need to turn off the validators, bcos indeed we want to validate e.g we
+  // want the validator to confirm if the password is equal to passwordConfirm
+  await user.save();
+
+  // 6)  Update the changedPasswordAt ppt for the current user
+  //This part will be done in the userModel using a pre('save) middleware
+
+  // 7) Log the user in i.e send the JWT to the client
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
 });
 // Ends here

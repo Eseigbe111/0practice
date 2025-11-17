@@ -1,6 +1,6 @@
 ///THIS IS FOR THIS LECTURE
 
-// THis will be coded in  "email.js" in the utils folder, config.env and "authController",
+// THis will be coded in userRoute "authController" and  "userModel"
 
 // Ends here
 
